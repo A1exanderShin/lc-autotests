@@ -18,7 +18,8 @@ with conn.cursor() as cursor:
     cursor.execute("""
         SELECT provider_name, alias, game_name
         FROM game_slots
-        WHERE api = 'mobule';
+        WHERE api = 'mobule' AND provider_name = 'evoplay';
+
     """)
     games = cursor.fetchall()
 
@@ -102,18 +103,18 @@ with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         image_report.extend(future.result())
 
 # Сохраняем отчёты
-with open("image_check_report.txt", "w", encoding="utf-8") as f_report:
+with open("../tests/image_check_report.txt", "w", encoding="utf-8") as f_report:
     f_report.write("\n".join(image_report))
 
-with open("found_image_links.txt", "w", encoding="utf-8") as f_found:
+with open("../tests/found_image_links.txt", "w", encoding="utf-8") as f_found:
     for link in valid_links:
         f_found.write(link + "\n")
 
-with open("not_found_image_links.txt", "w", encoding="utf-8") as f_not_found:
+with open("../tests/not_found_image_links.txt", "w", encoding="utf-8") as f_not_found:
     for link in invalid_links:
         f_not_found.write(link + "\n")
 
-with open("games_without_images.txt", "w", encoding="utf-8") as f_no_img:
+with open("../tests/games_without_images.txt", "w", encoding="utf-8") as f_no_img:
     for game_name in games_without_images:
         f_no_img.write(game_name + "\n")
 
