@@ -1,9 +1,8 @@
 import requests
-from configuration import SERVICE_URL
-from jsonschema import validate
+from src.utils.config import SERVICE_URL
 
 from src.schemas.get import GET_DEMO_SLOT_ID_SCHEMA
-from src.baseclasses.response import Response
+from src.clients.base_client import Response
 
 def test_list_slots():
     r = requests.get(url = f'{SERVICE_URL}/slots?offset&limit&filterByProvider&sortBy')
