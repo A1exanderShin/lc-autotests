@@ -1,4 +1,31 @@
-venv
-.idea
-__pycache__
-pytest.cache
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# pytest
+.pytest_cache/
+.cache/
+
+# Отчёты и артефакты
+reports/
+allure-results/
+allure-report/
+*.html
+*.log
+logs/
+
+# ОС
+.DS_Store
+Thumbs.db
