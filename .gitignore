@@ -1,0 +1,26 @@
+# --- Python venv ---
+.venv/
+venv/
+env/
+
+# --- IDE / PyCharm ---
+.idea/
+.vscode/
+
+# --- pytest cache ---
+.pytest_cache/
+__pycache__/
+
+# --- Byte-compiled files ---
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+
+# --- OS garbage ---
+.DS_Store
+Thumbs.db
+
+# --- Project metadata that should never be pushed ---
+PROJECT_STATE.md
