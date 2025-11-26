@@ -19,7 +19,7 @@ class HttpBase:
 
         # Если клиент авторизован и есть токен → добавляем в заголовки
         if self.token:
-            final_headers["Authorization"] = f"Bearer {self.token}"
+            final_headers["X-Access-Token"] = self.token
 
         # По умолчанию указываем, что отправляем JSON (если клиент этого не сделал раньше)
         final_headers.setdefault("Content-Type", "application/json")
