@@ -1,3 +1,4 @@
+import allure
 import requests  # библиотека для HTTP-запросов
 from typing import Optional, Dict  # типы для удобства и читаемости
 
@@ -10,10 +11,6 @@ class HttpBase:
 
     # Метод для сборки заголовков
     def build_headers(self, headers: Optional[Dict] = None) -> Dict:
-        """
-        Объединяет заголовки, переданные вручную, и добавляет токен, если он установлен.
-        Возвращает финальный набор заголовков.
-        """
         # Если передали headers → копируем их; если нет → создаём пустой словарь
         final_headers = headers.copy() if headers else {}
 
@@ -29,50 +26,34 @@ class HttpBase:
 
     # Метод GET-запроса
     def get(self, path: str, params: Dict | None = None, headers: Dict | None = None):
-        """
-        Выполняет GET-запрос по указанному path.
-        path — путь без base_url (например: "/auth/login")
-        params — query-параметры (dict)
-        headers — дополнительные заголовки
-        """
-        # Собираем полный URL
         url = self.base_url + path
-
-        # Собираем финальные заголовки
         final_headers = self.build_headers(headers)
 
-        # Лог простыми принтами (позже сделаем через logging)
-        print(f"[GET] {url} params={params}")
+        with allure.step(f"GET {url}"):
+            if params:
+                allure.attach(str(params), "Request Params", allure.attachment_type.TEXT)
 
-        # Выполняем реальный HTTP GET-запрос
-        response = requests.get(url, params=params, headers=final_headers)
+            response = requests.get(url, params=params, headers=final_headers)
 
-        # Лог статуса ответа
-        print(f"[GET] {url} → {response.status_code}")
+            allure.attach(response.text, "Response JSON", allure.attachment_type.JSON)
 
-        # Возвращаем response обратно в тесты
-        return response
+            return response
 
     # Метод POST-запроса
     def post(self, path: str, json: Dict | None = None, headers: Dict | None = None):
-        """
-        Выполняет POST-запрос.
-        json — тело запроса в виде словаря (автоматически сериализуется в JSON)
-        """
-        # Формируем URL
         url = self.base_url + path
-
-        # Формируем заголовки
         final_headers = self.build_headers(headers)
 
-        # Логируем запрос
-        print(f"[POST] {url} json={json}")
+        with allure.step(f"POST {url}"):
+            if json is not None:
+                allure.attach(str(json), "Request JSON", allure.attachment_type.JSON)
 
-        # Отправляем POST-запрос
-        response = requests.post(url, json=json, headers=final_headers)
+            response = requests.post(url, json=json, headers=final_headers)
 
-        # Логируем результат
-        print(f"[POST] {url} → {response.status_code}")
+            try:
+                allure.attach(response.text, "Response JSON", allure.attachment_type.JSON)
+            except:
+                pass
 
-        # Возвращаем ответ
-        return response
+            return response
+

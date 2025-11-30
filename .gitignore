@@ -24,3 +24,8 @@ Thumbs.db
 
 # --- Project metadata that should never be pushed ---
 PROJECT_STATE.md
+
+# Allure
+allure-results/
+allure-report/
+

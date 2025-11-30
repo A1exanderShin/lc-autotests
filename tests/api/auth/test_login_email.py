@@ -1,9 +1,7 @@
 def test_login_positive(auth_user_email):
-    # 1) Проверяем токен
     token = auth_user_email.http.token
     assert token is not None, "Токен не был установлен после login"
 
-    # 2) Делаем запрос к защищённой ручке
     resp = auth_user_email.http.get("/user/me")
     assert resp.status_code == 200, f"/user/me вернул {resp.status_code}, ожидаем 200"
 
