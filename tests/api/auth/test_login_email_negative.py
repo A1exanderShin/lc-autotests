@@ -125,7 +125,7 @@ def test_login_email_wrong_password_dict(auth_client, session_id_email):
 
 def test_login_email_wrong_password_emoji(auth_client, session_id_email):
     resp = auth_client.login_email(
-        password="😀😀😀",
+        password="123123123😀😀😀",
         sessionId=session_id_email
     )
 
