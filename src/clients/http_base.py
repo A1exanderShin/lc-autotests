@@ -1,30 +1,24 @@
 import allure
-import requests  # библиотека для HTTP-запросов
-from typing import Optional, Dict  # типы для удобства и читаемости
+import requests
+from typing import Optional, Dict
 
 
 class HttpBase:
-    # Конструктор — вызывается при создании объекта клиента
     def __init__(self, base_url: str, token: str = None):
         self.base_url = base_url  # базовый URL API (например: "https://stage.api.com")
         self.token = token  # токен пользователя, если он есть
 
-    # Метод для сборки заголовков
     def build_headers(self, headers: Optional[Dict] = None) -> Dict:
-        # Если передали headers → копируем их; если нет → создаём пустой словарь
         final_headers = headers.copy() if headers else {}
 
-        # Если клиент авторизован и есть токен → добавляем в заголовки
         if self.token:
             final_headers["X-Access-Token"] = self.token
 
-        # По умолчанию указываем, что отправляем JSON (если клиент этого не сделал раньше)
         final_headers.setdefault("Content-Type", "application/json")
 
-        # Возвращаем итоговый набор заголовков
         return final_headers
 
-    # Метод GET-запроса
+
     def get(self, path: str, params: Dict | None = None, headers: Dict | None = None):
         url = self.base_url + path
         final_headers = self.build_headers(headers)
@@ -39,7 +33,7 @@ class HttpBase:
 
             return response
 
-    # Метод POST-запроса
+
     def post(self, path: str, json: Dict | None = None, headers: Dict | None = None):
         url = self.base_url + path
         final_headers = self.build_headers(headers)

@@ -33,7 +33,6 @@ class AuthClient:
         }
         response = self.http.post("/auth/email_login", json=payload)
 
-        # сохраняем токен в http клиент, чтобы другие клиенты могли его использовать
         if response.status_code == 200:
             data = response.json()
             token = data.get("token")
@@ -74,7 +73,6 @@ class AuthClient:
         }
         response = self.http.post("/auth/login", json=payload)
 
-        # сохраняем токен в http клиент, чтобы другие клиенты могли его использовать
         if response.status_code == 200:
             data = response.json()
             token = data.get("token")
