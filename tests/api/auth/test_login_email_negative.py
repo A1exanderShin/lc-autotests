@@ -1,222 +1,71 @@
 import pytest
 
 
-# ПУСТЫЕ ЗНАЧЕНИЯ
-def test_login_email_empty_password(auth_client, session_id_email):
+# ПУСТЫЕ И ОТСУТСТВУЮЩИЕ ПОЛЯ
+@pytest.mark.parametrize("password, sessionId, description", [
+    ("", "valid", "пустой password"),
+    ("valid", "", "пустой sessionId"),
+    ("", "", "оба поля пустые"),
+])
+def test_login_email_empty_values(auth_client, session_id_email, password, sessionId, description):
+    if sessionId == "valid":
+        sessionId = session_id_email
+
     resp = auth_client.login_email(
-        password="",
+        password=password,
+        sessionId=sessionId
+    )
+
+    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+
+
+@pytest.mark.parametrize("payload, description", [
+    ({"sessionId": "AAA"}, "нет password"),
+    ({"password": "123123123"}, "нет sessionId"),
+    ({}, "пустой JSON"),
+])
+def test_login_email_missing_fields(auth_client, session_id_email, payload, description):
+    resp = auth_client.http.post("/auth/email_login", json=payload)
+
+    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+
+
+# НЕВЕРНЫЕ ТИПЫ / ФОРМАТ PASSWORD
+@pytest.mark.parametrize("password, description", [
+    (123123123, "password = null"),
+    (True, "password = boolean"),
+    (None, "password = null"),
+    (["123"], "password = список"),
+    ({"p": "123"}, "password = объект"),
+    ("😀😀😀123123123", "password содержит emoji"),
+    ("1" * 5000, "слишком длинный password"),
+])
+def test_login_email_invalid_password(auth_client, session_id_email, password, description):
+    resp = auth_client.login_email(
+        password=password,
         sessionId=session_id_email
     )
 
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
+    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
 
 
-def test_login_email_empty_sessionId(auth_client, session_id_email):
+
+
+
+# НЕВЕРНЫЕ ТИПЫ / ФОРМАТ sessionId
+@pytest.mark.parametrize("sessionId, description", [
+    (True, "sessionId = boolean"),
+    (123, "sessionId = int"),
+    (None, "sessionId = null"),
+    (["abc"], "sessionId = список"),
+    ({"id": "abc"}, "sessionId = объект"),
+    ("😀😀😀", "sessionId = emoji"),
+    ("1" * 5000, "слишком длинный sessionId"),
+])
+def test_login_email_invalid_sessionId(auth_client, session_id_email, sessionId, description):
     resp = auth_client.login_email(
         password="123123123",
-        sessionId=""
+        sessionId=sessionId
     )
 
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-def test_login_email_empty_all(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="",
-        sessionId=""
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-
-
-
-# НЕКОРРЕКТНАЯ СТРУКТУРА ЗАПРОСА
-def test_login_email_without_password(auth_client, session_id_email):
-    resp = auth_client.http.post("/auth/email_login", json={
-        "sessionId": session_id_email
-    })
-
-    assert resp.status_code in (400, 401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_without_sessionId(auth_client, session_id_email):
-    resp = auth_client.http.post("/auth/email_login", json={
-        "password": "123123123"
-    })
-
-    assert resp.status_code in (400, 401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-def test_login_email_without_all(auth_client, session_id_email):
-    resp = auth_client.http.post("/auth/email_login", json={})
-
-    assert resp.status_code in (400, 401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-
-
-# НЕВЕРНЫЕ ЗНАЧЕНИЯ И ТИПЫ
-def test_login_email_wrong_password_boolean(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password=True,
-        sessionId=session_id_email
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-@pytest.mark.xfail(reason="Backend converts int password to string — needs validation")
-def test_login_email_wrong_password_int(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password=123123123,
-        sessionId=session_id_email
-    )
-
-    assert resp.status_code == 200, (
-        f"Ожидали 200, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_password_none(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password=None,
-        sessionId=session_id_email
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_password_list(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password=["123123123"],
-        sessionId=session_id_email
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_password_dict(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password={"password": "123123123"},
-        sessionId=session_id_email
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_password_emoji(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123😀😀😀",
-        sessionId=session_id_email
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_long_password(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="1" * 5000,
-        sessionId=session_id_email
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_sessionId_boolean(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123",
-        sessionId=True
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_sessionId_int(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123",
-        sessionId=123123123
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_sessionId_none(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123",
-        sessionId=None
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_sessionId_list(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123",
-        sessionId=[session_id_email]
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_sessionId_dict(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123",
-        sessionId={"sessionId": session_id_email}
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_wrong_sessionId_emoji(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123",
-        sessionId="😀😀😀"
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
-
-
-def test_login_email_long_sessionId(auth_client, session_id_email):
-    resp = auth_client.login_email(
-        password="123123123",
-        sessionId="1" * 5000
-    )
-
-    assert resp.status_code in (400,401), (
-        f"Ожидали 400/401, но получили {resp.status_code}. Ответ: {resp.text}"
-    )
+    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
