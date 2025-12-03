@@ -25,7 +25,8 @@ def test_register_email_missing_fields(
     use_lang,
     use_session,
     description,
-):
+    assert_response):
+
     payload = {}
 
     if use_password:
@@ -68,7 +69,8 @@ def test_register_email_invalid_password(
     session_id_email_new,
     password,
     description,
-):
+    assert_response):
+
     resp = auth_client.register_email(
         password=password,
         currency_id=4,
@@ -103,7 +105,8 @@ def test_register_email_invalid_currency_id(
     session_id_email_new,
     currency_id,
     description,
-):
+    assert_response):
+
     resp = auth_client.register_email(
         password=TEST_REGISTER_PASSWORD,
         currency_id=currency_id,
@@ -138,7 +141,8 @@ def test_register_email_invalid_langAlias(
     session_id_email_new,
     langAlias,
     description,
-):
+    assert_response):
+
     resp = auth_client.register_email(
         password=TEST_REGISTER_PASSWORD,
         currency_id=4,
@@ -175,7 +179,8 @@ def test_register_email_invalid_sessionId(
     session_id_email_new,
     sessionId,
     description,
-):
+    assert_response):
+
     resp = auth_client.register_email(
         password=TEST_REGISTER_PASSWORD,
         currency_id=4,

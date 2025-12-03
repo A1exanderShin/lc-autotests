@@ -49,9 +49,6 @@ def test_login_email_invalid_password(auth_client, session_id_email, password, d
     assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
 
 
-
-
-
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ sessionId
 @pytest.mark.parametrize("sessionId, description", [
     (True, "sessionId = boolean"),
