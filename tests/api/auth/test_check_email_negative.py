@@ -47,7 +47,7 @@ def test_check_email_invalid_email(auth_client, assert_response, email, descript
     ("999.999.999.999", "невалидный ipv4"),
     ("test",            "строка без формата ip"),
     (123,               "число вместо ip"),
-    ({"value": 123},             "объект вместо ip"),
+    ({"value": 123},    "объект вместо ip"),
     ([123],             "список вместо ip"),
     (None,              "null ip"),
     (False,             "boolean-значение вместо ip"),
@@ -63,12 +63,12 @@ def test_check_email_invalid_ip(auth_client, assert_response, ip, description):
     assert_response(resp, expected=(400,401), msg=f"Неверный формат ip: ({description})")
 
 @pytest.mark.parametrize("user_agent,description", [
-    (123,       "число вместо user-agent"),
-    ({"value": 123},     "объект вместо user-agent"),
-    ([123],     "список вместо user-agent"),
-    (None,      "null user-agent"),
-    (False,     "boolean-значение вместо user-agent"),
-    ("",        "пустой user-agent"),
+    (123,               "число вместо user-agent"),
+    ({"value": 123},    "объект вместо user-agent"),
+    ([123],             "список вместо user-agent"),
+    (None,              "null user-agent"),
+    (False,             "boolean-значение вместо user-agent"),
+    ("",                "пустой user-agent"),
 ])
 def test_check_email_invalid_user_agent(auth_client, assert_response, user_agent, description):
     resp = auth_client.check_email(

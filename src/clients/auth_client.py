@@ -3,8 +3,11 @@ from pydantic import ValidationError
 from src.clients.http_base import HttpBase
 from src.models.auth.common.errors import ErrorResponse
 from src.models.auth.email.check_email import CheckEmailResponse
-from src.models.auth.email.email_login import LoginEmailResponse
-from src.models.auth.email.email_register import EmailRegisterResponse
+from src.models.auth.email.login_email import LoginEmailResponse
+from src.models.auth.email.register_email import RegisterEmailResponse
+from src.models.auth.phone.check_phone import CheckPhoneResponse
+from src.models.auth.phone.login_phone import LoginPhoneResponse
+from src.models.auth.phone.register_phone import RegisterPhoneResponse
 
 
 class AuthClient:
@@ -45,10 +48,10 @@ class AuthClient:
         }
 
         response = self.http.post("/auth/email_register", json=payload)
-        parsed = self._parse(response, EmailRegisterResponse)
+        parsed = self._parse(response, RegisterEmailResponse)
 
         # Если успешный ответ — сохраняем токен
-        if isinstance(parsed, EmailRegisterResponse):
+        if isinstance(parsed, RegisterEmailResponse):
             self.http.token = parsed.token
 
         return parsed
@@ -80,8 +83,9 @@ class AuthClient:
         }
 
         response = self.http.post("/auth/check_phone", json=payload)
+        parsed = self._parse(response, CheckPhoneResponse)
 
-        return response
+        return parsed
 
     def register_phone(self, password: str, sessionId: str):
         payload = {
@@ -90,8 +94,13 @@ class AuthClient:
         }
 
         response = self.http.post("/auth/register", json=payload)
+        parsed = self._parse(response, RegisterPhoneResponse)
 
-        return response
+        # Если успешный ответ — сохраняем токен
+        if isinstance(parsed, RegisterPhoneResponse):
+            self.http.token = parsed.token
+
+        return parsed
 
     def login_phone(self, password: str, sessionId: str):
         payload = {
@@ -99,13 +108,13 @@ class AuthClient:
             "sessionId": sessionId
         }
         response = self.http.post("/auth/login", json=payload)
+        parsed = self._parse(response, LoginPhoneResponse)
 
-        if response.status_code == 200:
-            data = response.json()
-            token = data.get("token")
-            if token:
-                self.http.token = token
+        # Если успешный ответ — устанавливаем токен в HttpBase
+        if isinstance(parsed, LoginPhoneResponse):
+            self.http.token = parsed.token
 
-        return response
+        return parsed
+
 
 

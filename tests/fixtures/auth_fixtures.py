@@ -5,12 +5,12 @@ import pytest
 
 from src.clients.auth_client import AuthClient
 
-# Pydantic модели
 from src.models.auth.email.check_email import CheckEmailResponse
-from src.models.auth.email.email_login import LoginEmailResponse
-from src.models.auth.email.email_register import EmailRegisterResponse
-from src.models.auth.common.errors import ErrorResponse
-
+from src.models.auth.email.login_email import LoginEmailResponse
+from src.models.auth.email.register_email import RegisterEmailResponse
+from src.models.auth.phone.check_phone import CheckPhoneResponse
+from src.models.auth.phone.login_phone import LoginPhoneResponse
+from src.models.auth.phone.register_phone import RegisterPhoneResponse
 
 BASE_URL = "https://test2.lototeam.com/api/lotoclub_api/v1"
 
@@ -98,7 +98,7 @@ def registered_user_email(auth_client, session_id_email_new):
         sessionId=session_id_email_new
     )
 
-    assert isinstance(response, EmailRegisterResponse), (
+    assert isinstance(response, RegisterEmailResponse), (
         f"register_email returned error: {response}"
     )
 
@@ -120,14 +120,12 @@ def session_id_phone(auth_client):
         user_agent=TEST_USER_AGENT
     )
 
-    # пока check_phone возвращает raw response
-    assert response.status_code == 200, f"check_phone failed: {response.text}"
+    # Новая проверка: response — это Pydantic модель
+    assert isinstance(response, CheckPhoneResponse), (
+        f"check_phone failed: {response}"
+    )
 
-    data = response.json()
-    session_id = data.get("sessionId")
-
-    assert session_id, "sessionId отсутствует в ответе check_phone"
-    return session_id
+    return response.sessionId
 
 
 @pytest.fixture
@@ -137,13 +135,14 @@ def auth_user_phone(auth_client, session_id_phone):
         sessionId=session_id_phone
     )
 
-    assert response.status_code == 200, f"login failed: {response.text}"
+    # Теперь response — LoginPhoneResponse
+    assert isinstance(response, LoginPhoneResponse), (
+        f"login_phone returned error: {response}"
+    )
 
-    data = response.json()
-    token = data.get("token")
-    assert token, "В ответе нет токена"
+    # Токен уже установлен внутри клиента
+    assert auth_client.http.token, "Token not set in AuthClient"
 
-    auth_client.http.token = token
     return auth_client
 
 
@@ -156,13 +155,11 @@ def session_id_phone_new(auth_client, random_phone):
         user_agent=TEST_USER_AGENT
     )
 
-    assert response.status_code == 200, f"check_phone failed: {response.text}"
+    assert isinstance(response, CheckPhoneResponse), (
+        f"check_phone failed: {response}"
+    )
 
-    data = response.json()
-    session_id = data.get("sessionId")
-
-    assert session_id, "sessionId отсутствует в ответе check_phone"
-    return session_id
+    return response.sessionId
 
 
 @pytest.fixture
@@ -172,13 +169,12 @@ def registered_user_phone(auth_client, session_id_phone_new):
         sessionId=session_id_phone_new
     )
 
-    assert response.status_code == 200, f"registration failed: {response.text}"
+    assert isinstance(response, RegisterPhoneResponse), (
+        f"register_phone returned error: {response}"
+    )
 
-    data = response.json()
-    token = data.get("token")
-    assert token, "В ответе нет токена"
+    assert auth_client.http.token, "Token not set in AuthClient"
 
-    auth_client.http.token = token
     return auth_client
 
 
