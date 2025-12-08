@@ -1,6 +1,5 @@
 import pytest
 
-
 # ПУСТЫЕ ЗНАЧЕНИЯ
 @pytest.mark.parametrize("password, sessionId, description", [
     ("", "valid", "пустой password"),
@@ -16,7 +15,7 @@ def test_login_phone_empty_values(auth_client, session_id_phone, password, sessi
         sessionId=sessionId
     )
 
-    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400, 404), msg=description)
 
 
 # ОТСУТСТВУЮЩИЕ ПОЛЯ
@@ -28,9 +27,7 @@ def test_login_phone_empty_values(auth_client, session_id_phone, password, sessi
 def test_login_phone_missing_fields(auth_client, session_id_phone, payload, description, assert_response):
     resp = auth_client.http.post("/auth/phone_login", json=payload)
 
-    expected = (400, 401, 404)
-
-    assert_response(resp, expected=expected, msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400, 401, 404), msg=description)
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ PASSWORD
@@ -49,7 +46,7 @@ def test_login_phone_invalid_password(auth_client, session_id_phone, password, d
         sessionId=session_id_phone
     )
 
-    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400,), msg=description)
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ sessionId
@@ -62,10 +59,10 @@ def test_login_phone_invalid_password(auth_client, session_id_phone, password, d
     ("😀😀😀", "sessionId = emoji"),
     ("1" * 5000, "слишком длинный sessionId"),
 ])
-def test_login_phone_invalid_sessionId(auth_client, session_id_phone, sessionId, description):
+def test_login_phone_invalid_sessionId(auth_client, session_id_phone, sessionId, description, assert_response):
     resp = auth_client.login_phone(
         password="123123123",
         sessionId=sessionId
     )
 
-    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400,), msg=description)

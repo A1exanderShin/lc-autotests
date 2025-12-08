@@ -43,7 +43,7 @@ def test_register_email_missing_fields(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Отсутствуют обязательные/обязательные поля: {description}",
     )
 
@@ -80,7 +80,7 @@ def test_register_email_invalid_password(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Неверное значение password: {description}",
     )
 
@@ -116,7 +116,7 @@ def test_register_email_invalid_currency_id(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Неверное значение currency_id: {description}",
     )
 
@@ -152,7 +152,7 @@ def test_register_email_invalid_langAlias(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Неверное значение langAlias: {description}",
     )
 
@@ -190,6 +190,6 @@ def test_register_email_invalid_sessionId(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Неверное значение sessionId: {description}",
     )

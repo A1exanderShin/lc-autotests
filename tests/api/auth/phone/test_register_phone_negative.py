@@ -41,7 +41,7 @@ def test_register_phone_missing_fields(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Отсутствуют обязательные поля: {description}"
     )
 
@@ -78,7 +78,7 @@ def test_register_phone_invalid_password(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Неверное значение password: {description}",
     )
 
@@ -116,6 +116,6 @@ def test_register_phone_invalid_sessionId(
 
     assert_response(
         resp,
-        expected=(400, 401),
+        expected=(400,),
         msg=f"Неверное значение sessionId: {description}",
     )
