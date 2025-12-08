@@ -12,7 +12,7 @@ from tests.fixtures.auth_fixtures import TEST_IP, TEST_USER_AGENT, TEST_EMAIL
 def test_check_email_missing_fields(auth_client, assert_response, payload, description):
     resp = auth_client.http.post("/auth/check_email", json=payload)
 
-    assert_response(resp, expected=(400,401), msg=f"Отсутствуют обязательные поля: ({description})")
+    assert_response(resp, expected=(400, 404), msg=f"Отсутствуют обязательные поля: ({description})")
 
 
 
@@ -41,7 +41,7 @@ def test_check_email_invalid_email(auth_client, assert_response, email, descript
         user_agent=TEST_USER_AGENT
     )
 
-    assert_response(resp, expected=(400,401), msg=f"Неверный формат email: ({description})")
+    assert_response(resp, expected=(400,), msg=f"Неверный формат email: ({description})")
 
 @pytest.mark.parametrize("ip,description", [
     ("999.999.999.999", "невалидный ipv4"),
@@ -60,7 +60,7 @@ def test_check_email_invalid_ip(auth_client, assert_response, ip, description):
         user_agent=TEST_USER_AGENT
     )
 
-    assert_response(resp, expected=(400,401), msg=f"Неверный формат ip: ({description})")
+    assert_response(resp, expected=(400,), msg=f"Неверный формат ip: ({description})")
 
 @pytest.mark.parametrize("user_agent,description", [
     (123,               "число вместо user-agent"),
@@ -77,4 +77,4 @@ def test_check_email_invalid_user_agent(auth_client, assert_response, user_agent
         user_agent=user_agent
     )
 
-    assert_response(resp, expected=(400,401), msg=f"Неверный формат user-agent: ({description})")
+    assert_response(resp, expected=(400,), msg=f"Неверный формат user-agent: ({description})")

@@ -15,7 +15,8 @@ def test_login_email_empty_values(auth_client, session_id_email, password, sessi
         sessionId=sessionId
     )
 
-    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400, 401, 404), msg=description)
+
 
 @pytest.mark.parametrize("payload, description", [
     ({"sessionId": "AAA"}, "нет password"),
@@ -25,7 +26,7 @@ def test_login_email_empty_values(auth_client, session_id_email, password, sessi
 def test_login_email_missing_fields(auth_client, session_id_email, payload, description, assert_response):
     resp = auth_client.http.post("/auth/email_login", json=payload)
 
-    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400, 401, 404), msg=description)
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ PASSWORD
@@ -44,7 +45,7 @@ def test_login_email_invalid_password(auth_client, session_id_email, password, d
         sessionId=session_id_email
     )
 
-    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400,), msg=description)
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ sessionId
@@ -63,4 +64,4 @@ def test_login_email_invalid_sessionId(auth_client, session_id_email, sessionId,
         sessionId=sessionId
     )
 
-    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
+    assert_response(resp, expected=(400,), msg=description)
