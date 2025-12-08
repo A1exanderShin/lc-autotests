@@ -1,13 +1,12 @@
 import pytest
 
-
 # ПУСТЫЕ И ОТСУТСТВУЮЩИЕ ПОЛЯ
 @pytest.mark.parametrize("password, sessionId, description", [
     ("", "valid", "пустой password"),
     ("valid", "", "пустой sessionId"),
     ("", "", "оба поля пустые"),
 ])
-def test_login_email_empty_values(auth_client, session_id_email, password, sessionId, description):
+def test_login_email_empty_values(auth_client, session_id_email, password, sessionId, description, assert_response):
     if sessionId == "valid":
         sessionId = session_id_email
 
@@ -16,18 +15,17 @@ def test_login_email_empty_values(auth_client, session_id_email, password, sessi
         sessionId=sessionId
     )
 
-    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
-
+    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
 
 @pytest.mark.parametrize("payload, description", [
     ({"sessionId": "AAA"}, "нет password"),
     ({"password": "123123123"}, "нет sessionId"),
     ({}, "пустой JSON"),
 ])
-def test_login_email_missing_fields(auth_client, session_id_email, payload, description):
+def test_login_email_missing_fields(auth_client, session_id_email, payload, description, assert_response):
     resp = auth_client.http.post("/auth/email_login", json=payload)
 
-    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ PASSWORD
@@ -40,13 +38,13 @@ def test_login_email_missing_fields(auth_client, session_id_email, payload, desc
     ("😀😀😀123123123", "password содержит emoji"),
     ("1" * 5000, "слишком длинный password"),
 ])
-def test_login_email_invalid_password(auth_client, session_id_email, password, description):
+def test_login_email_invalid_password(auth_client, session_id_email, password, description, assert_response):
     resp = auth_client.login_email(
         password=password,
         sessionId=session_id_email
     )
 
-    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ sessionId
@@ -59,10 +57,10 @@ def test_login_email_invalid_password(auth_client, session_id_email, password, d
     ("😀😀😀", "sessionId = emoji"),
     ("1" * 5000, "слишком длинный sessionId"),
 ])
-def test_login_email_invalid_sessionId(auth_client, session_id_email, sessionId, description):
+def test_login_email_invalid_sessionId(auth_client, session_id_email, sessionId, description, assert_response):
     resp = auth_client.login_email(
         password="123123123",
         sessionId=sessionId
     )
 
-    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")

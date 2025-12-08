@@ -1,9 +1,10 @@
-def test_register_positive(registered_user_phone):
+def test_register_positive(registered_user_phone, assert_response):
     token = registered_user_phone.http.token
     assert token is not None, "Токен не был установлен после регистрации"
 
     resp = registered_user_phone.http.get("/user/me")
-    assert resp.status_code == 200, f"/user/me вернул {resp.status_code}, ожидаем 200"
+
+    assert_response(resp, expected=(200,), msg=f"/user/me вернул {resp.status_code}, ожидаем 200")
 
     data = resp.json()
     assert "user" in data, "В ответе отсутствует объект user"
