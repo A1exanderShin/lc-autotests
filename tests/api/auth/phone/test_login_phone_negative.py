@@ -7,7 +7,7 @@ import pytest
     ("valid", "", "пустой sessionId"),
     ("", "", "оба поля пустые"),
 ])
-def test_login_phone_empty_values(auth_client, session_id_phone, password, sessionId, description):
+def test_login_phone_empty_values(auth_client, session_id_phone, password, sessionId, description, assert_response):
     if sessionId == "valid":
         sessionId = session_id_phone
 
@@ -16,7 +16,7 @@ def test_login_phone_empty_values(auth_client, session_id_phone, password, sessi
         sessionId=sessionId
     )
 
-    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
 
 
 # ОТСУТСТВУЮЩИЕ ПОЛЯ
@@ -25,13 +25,12 @@ def test_login_phone_empty_values(auth_client, session_id_phone, password, sessi
     ({"password": "123123123"}, "нет sessionId"),
     ({}, "пустой JSON"),
 ])
-def test_login_phone_missing_fields(auth_client, session_id_phone, payload, description):
+def test_login_phone_missing_fields(auth_client, session_id_phone, payload, description, assert_response):
     resp = auth_client.http.post("/auth/phone_login", json=payload)
 
-    # В оригинале у тебя один тест ожидает 404 — оставляем как есть
     expected = (400, 401, 404)
 
-    assert resp.status_code in expected, f"{description}: получили {resp.status_code}"
+    assert_response(resp, expected=expected, msg=f"{description}: получили {resp.status_code}")
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ PASSWORD
@@ -44,13 +43,13 @@ def test_login_phone_missing_fields(auth_client, session_id_phone, payload, desc
     ("😀😀😀", "password содержит emoji"),
     ("1" * 5000, "слишком длинный password"),
 ])
-def test_login_phone_invalid_password(auth_client, session_id_phone, password, description):
+def test_login_phone_invalid_password(auth_client, session_id_phone, password, description, assert_response):
     resp = auth_client.login_phone(
         password=password,
         sessionId=session_id_phone
     )
 
-    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
 
 
 # НЕВЕРНЫЕ ТИПЫ / ФОРМАТ sessionId
@@ -69,4 +68,4 @@ def test_login_phone_invalid_sessionId(auth_client, session_id_phone, sessionId,
         sessionId=sessionId
     )
 
-    assert resp.status_code in (400, 401), f"{description}: получили {resp.status_code}"
+    assert_response(resp, expected=(400, 401), msg=f"{description}: получили {resp.status_code}")
