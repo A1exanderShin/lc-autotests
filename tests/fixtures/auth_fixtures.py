@@ -8,6 +8,8 @@ from src.clients.auth_client import AuthClient
 from src.models.auth.email.check_email import CheckEmailResponse
 from src.models.auth.email.login_email import LoginEmailResponse
 from src.models.auth.email.register_email import RegisterEmailResponse
+from src.models.auth.fast_reg.confirm import FastRegConfirmResponse
+from src.models.auth.fast_reg.signUp import FastRegSignUpResponse
 from src.models.auth.phone.check_phone import CheckPhoneResponse
 from src.models.auth.phone.login_phone import LoginPhoneResponse
 from src.models.auth.phone.register_phone import RegisterPhoneResponse
@@ -37,7 +39,7 @@ def auth_client():
 
 
 # ============================================================
-# EMAIL FIXTURES — адаптация под pydantic
+# EMAIL FIXTURES
 # ============================================================
 
 @pytest.fixture
@@ -108,7 +110,7 @@ def registered_user_email(auth_client, session_id_email_new):
 
 
 # ============================================================
-# PHONE FIXTURES — пока оставляем RAW requests.Response
+# PHONE FIXTURES
 # ============================================================
 
 @pytest.fixture
@@ -172,6 +174,41 @@ def registered_user_phone(auth_client, session_id_phone_new):
     assert isinstance(response, RegisterPhoneResponse), (
         f"register_phone returned error: {response}"
     )
+
+    assert auth_client.http.token, "Token not set in AuthClient"
+
+    return auth_client
+
+
+# ============================================================
+# FASTREG FIXTURES
+# ============================================================
+
+@pytest.fixture
+def fastreg_phone_session_id(auth_client, random_phone):
+    response = auth_client.signup_phone(
+        phone=random_phone,
+        password=TEST_REGISTER_PASSWORD
+    )
+
+    # Новая проверка: response — это Pydantic модель
+    assert isinstance(response, FastRegSignUpResponse), (
+        f"signUp failed: {response}"
+    )
+
+    return response.session_id
+
+
+@pytest.fixture
+def fastreg_phone_user(auth_client, fastreg_phone_session_id):
+    response = auth_client.confirm_phone(
+        session_id=fastreg_phone_session_id
+    )
+
+    # Новая проверка: response — это Pydantic модель
+    assert isinstance(response, FastRegConfirmResponse), f"confirm failed: {response}"
+
+    assert response.token, "confirm не вернул token"
 
     assert auth_client.http.token, "Token not set in AuthClient"
 

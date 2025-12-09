@@ -5,6 +5,8 @@ from src.models.auth.common.errors import ErrorResponse
 from src.models.auth.email.check_email import CheckEmailResponse
 from src.models.auth.email.login_email import LoginEmailResponse
 from src.models.auth.email.register_email import RegisterEmailResponse
+from src.models.auth.fast_reg.confirm import FastRegConfirmResponse
+from src.models.auth.fast_reg.signUp import FastRegSignUpResponse
 from src.models.auth.phone.check_phone import CheckPhoneResponse
 from src.models.auth.phone.login_phone import LoginPhoneResponse
 from src.models.auth.phone.register_phone import RegisterPhoneResponse
@@ -115,6 +117,31 @@ class AuthClient:
             self.http.token = parsed.token
 
         return parsed
+
+
+
+    # FASTREG
+    def signup_phone(self, phone: str, password: str):
+        payload = {
+            "phone": phone,
+            "password": password
+        }
+        response = self.http.post("/auth/signUp", json=payload)
+        parsed = self._parse(response, FastRegSignUpResponse)
+
+        return parsed
+
+    def confirm_phone(self, session_id: str):
+        payload = {"session_id": session_id}
+        response = self.http.post("/auth/confirm", json=payload)
+        parsed = self._parse(response, FastRegConfirmResponse)
+
+        # Если успешный ответ — устанавливаем токен в HttpBase
+        if isinstance(parsed, FastRegConfirmResponse):
+            self.http.token = parsed.token
+
+        return parsed
+
 
 
 
