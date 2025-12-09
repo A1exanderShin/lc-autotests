@@ -142,6 +142,30 @@ class AuthClient:
 
         return parsed
 
+    def signup_email(self, email: str, password: str, currency_id: int, langAlias: str):
+        payload = {
+            "email": email,
+            "password": password,
+            "currency_id": currency_id,
+            "langAlias": langAlias
+        }
+        response = self.http.post("/auth/signUpEmail", json=payload)
+        parsed = self._parse(response, FastRegSignUpResponse)
+
+        return parsed
+
+    def confirm_email(self, session_id: str):
+        payload = {"session_id": session_id}
+        response = self.http.post("/auth/confirmEmail", json=payload)
+        parsed = self._parse(response, FastRegConfirmResponse)
+
+        # Если успешный ответ — устанавливаем токен в HttpBase
+        if isinstance(parsed, FastRegConfirmResponse):
+            self.http.token = parsed.token
+
+        return parsed
+
+
 
 
 
