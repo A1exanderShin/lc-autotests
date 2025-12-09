@@ -215,6 +215,38 @@ def fastreg_phone_user(auth_client, fastreg_phone_session_id):
     return auth_client
 
 
+@pytest.fixture
+def fastreg_email_session_id(auth_client, random_email):
+    response = auth_client.signup_email(
+        email=random_email,
+        password=TEST_REGISTER_PASSWORD,
+        currency_id=4,
+        langAlias="en"
+    )
+
+    # Новая проверка: response — это Pydantic модель
+    assert isinstance(response, FastRegSignUpResponse), (
+        f"signUp failed: {response}"
+    )
+
+    return response.session_id
+
+
+@pytest.fixture
+def fastreg_email_user(auth_client, fastreg_email_session_id):
+    response = auth_client.confirm_email(
+        session_id=fastreg_email_session_id
+    )
+
+    # Новая проверка: response — это Pydantic модель
+    assert isinstance(response, FastRegConfirmResponse), f"confirm failed: {response}"
+
+    assert response.token, "confirm не вернул token"
+
+    assert auth_client.http.token, "Token not set in AuthClient"
+
+    return auth_client
+
 # ============================================================
 # RANDOM DATA
 # ============================================================
