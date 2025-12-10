@@ -7,6 +7,7 @@ from src.models.auth.email.login_email import LoginEmailResponse
 from src.models.auth.email.register_email import RegisterEmailResponse
 from src.models.auth.fast_reg.confirm import FastRegConfirmResponse
 from src.models.auth.fast_reg.signUp import FastRegSignUpResponse
+from src.models.auth.password_recovery.send_mail import SendMailResponse
 from src.models.auth.phone.check_phone import CheckPhoneResponse
 from src.models.auth.phone.login_phone import LoginPhoneResponse
 from src.models.auth.phone.register_phone import RegisterPhoneResponse
@@ -164,6 +165,19 @@ class AuthClient:
             self.http.token = parsed.token
 
         return parsed
+
+
+    # PASSWORD RECOVERY
+    def send_mail(self, email: str, captcha_key: str = "", captcha: str = ""):
+        payload = {
+            "email": email,
+            "captcha_key": captcha_key,
+            "captcha": captcha
+        }
+        response = self.http.post("/auth/password_recovery/send_mail", json=payload)
+        return self._parse(response, SendMailResponse)
+
+
 
 
 

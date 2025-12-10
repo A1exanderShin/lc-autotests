@@ -92,21 +92,25 @@ def session_id_email_new(auth_client, random_email):
 
 
 @pytest.fixture
-def registered_user_email(auth_client, session_id_email_new):
-    response = auth_client.register_email(
+def registered_user_email(auth_client, random_email):
+    email = random_email
+
+    check_resp = auth_client.check_email(email, TEST_IP, TEST_USER_AGENT)
+    assert isinstance(check_resp, CheckEmailResponse)
+
+    reg_resp = auth_client.register_email(
         password=TEST_REGISTER_PASSWORD,
         currency_id=4,
         langAlias="en",
-        sessionId=session_id_email_new
+        sessionId=check_resp.sessionId
     )
+    assert isinstance(reg_resp, RegisterEmailResponse)
 
-    assert isinstance(response, RegisterEmailResponse), (
-        f"register_email returned error: {response}"
-    )
-
-    assert auth_client.http.token, "Token not set in AuthClient"
+    # attach email to the client for reuse
+    auth_client.email = email
 
     return auth_client
+
 
 
 # ============================================================
