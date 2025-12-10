@@ -200,19 +200,22 @@ def fastreg_phone_session_id(auth_client, random_phone):
 
 
 @pytest.fixture
-def fastreg_phone_user(auth_client, fastreg_phone_session_id):
-    response = auth_client.confirm_phone(
-        session_id=fastreg_phone_session_id
+def fastreg_phone_user(random_phone):
+    client = AuthClient(BASE_URL)
+
+    # signup phone
+    signup_resp = client.signup_phone(
+        phone=random_phone,
+        password=TEST_REGISTER_PASSWORD
     )
+    assert isinstance(signup_resp, FastRegSignUpResponse)
 
-    # Новая проверка: response — это Pydantic модель
-    assert isinstance(response, FastRegConfirmResponse), f"confirm failed: {response}"
+    # confirm phone
+    confirm_resp = client.confirm_phone(signup_resp.session_id)
+    assert isinstance(confirm_resp, FastRegConfirmResponse)
+    assert client.http.token, "Token not set"
 
-    assert response.token, "confirm не вернул token"
-
-    assert auth_client.http.token, "Token not set in AuthClient"
-
-    return auth_client
+    return client
 
 
 @pytest.fixture
@@ -233,19 +236,23 @@ def fastreg_email_session_id(auth_client, random_email):
 
 
 @pytest.fixture
-def fastreg_email_user(auth_client, fastreg_email_session_id):
-    response = auth_client.confirm_email(
-        session_id=fastreg_email_session_id
+def fastreg_email_user(random_email):
+    client = AuthClient(BASE_URL)
+
+    signup_resp = client.signup_email(
+        email=random_email,
+        password=TEST_REGISTER_PASSWORD,
+        currency_id=4,
+        langAlias="en"
     )
+    assert isinstance(signup_resp, FastRegSignUpResponse)
 
-    # Новая проверка: response — это Pydantic модель
-    assert isinstance(response, FastRegConfirmResponse), f"confirm failed: {response}"
+    confirm_resp = client.confirm_email(signup_resp.session_id)
+    assert isinstance(confirm_resp, FastRegConfirmResponse)
+    assert client.http.token, "Token not set"
 
-    assert response.token, "confirm не вернул token"
+    return client
 
-    assert auth_client.http.token, "Token not set in AuthClient"
-
-    return auth_client
 
 # ============================================================
 # RANDOM DATA
