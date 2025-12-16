@@ -13,6 +13,8 @@ from src.models.auth.fast_reg.signUp import FastRegSignUpResponse
 from src.models.auth.phone.check_phone import CheckPhoneResponse
 from src.models.auth.phone.login_phone import LoginPhoneResponse
 from src.models.auth.phone.register_phone import RegisterPhoneResponse
+from tests.dto.users import RegisteredEmailUser
+
 
 BASE_URL = "https://test2.lototeam.com/api/lotoclub_api/v1"
 
@@ -106,12 +108,10 @@ def registered_user_email(auth_client, random_email):
     )
     assert isinstance(reg_resp, RegisterEmailResponse)
 
-    # attach email to the client for reuse
-    auth_client.email = email
-
-    return auth_client
-
-
+    return RegisteredEmailUser(
+        client=auth_client,
+        email=email
+    )
 
 # ============================================================
 # PHONE FIXTURES
@@ -256,6 +256,27 @@ def fastreg_email_user(random_email):
     assert client.http.token, "Token not set"
 
     return client
+
+# ============================================================
+# PASSWORD RECOVERY
+# ============================================================
+
+@pytest.fixture
+def password_recovery_email_session(auth_client, registered_user_email):
+    email = registered_user_email.email
+
+    resp = auth_client.send_mail(email)
+    assert resp.code == 200
+    assert resp.status == "success"
+    assert resp.sessionId
+
+    sessionId = resp.sessionId
+
+    resp_confirm_mail = auth_client.confirm_mail_code("111111", sessionId)  # Используем нужный код для теста
+    assert resp_confirm_mail.status == "success"
+
+    return sessionId
+
 
 
 # ============================================================
