@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
+
 
 class RegisterEmailResponse(BaseModel):
     code: int
@@ -7,4 +9,3 @@ class RegisterEmailResponse(BaseModel):
     status: str
     token: str
     refreshToken: str
-

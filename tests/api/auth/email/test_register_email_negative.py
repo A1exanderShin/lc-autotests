@@ -3,12 +3,12 @@ import pytest
 from tests.conftest import assert_response
 from tests.fixtures.auth_fixtures import TEST_REGISTER_PASSWORD
 
-
 # ================================
 # 1. ОТСУТСТВУЮЩИЕ ПОЛЯ (STRUCTURE)
 # ================================
 
 # TODO: обновить ожидаемый статус-код после фиксов
+
 
 @pytest.mark.parametrize(
     "use_password, use_currency, use_lang, use_session, description",
@@ -28,7 +28,8 @@ def test_register_email_missing_fields(
     use_lang,
     use_session,
     description,
-    assert_response):
+    assert_response,
+):
 
     payload = {}
 
@@ -57,6 +58,7 @@ def test_register_email_missing_fields(
 
 # TODO: обновить ожидаемый статус-код после фиксов
 
+
 @pytest.mark.parametrize(
     "password, description",
     [
@@ -71,11 +73,8 @@ def test_register_email_missing_fields(
     ],
 )
 def test_register_email_invalid_password(
-    auth_client,
-    session_id_email_new,
-    password,
-    description,
-    assert_response):
+    auth_client, session_id_email_new, password, description, assert_response
+):
 
     resp = auth_client.register_email(
         password=password,
@@ -97,6 +96,7 @@ def test_register_email_invalid_password(
 
 # TODO: обновить ожидаемый статус-код после фиксов
 
+
 @pytest.mark.parametrize(
     "currency_id, description",
     [
@@ -110,11 +110,8 @@ def test_register_email_invalid_password(
     ],
 )
 def test_register_email_invalid_currency_id(
-    auth_client,
-    session_id_email_new,
-    currency_id,
-    description,
-    assert_response):
+    auth_client, session_id_email_new, currency_id, description, assert_response
+):
 
     resp = auth_client.register_email(
         password=TEST_REGISTER_PASSWORD,
@@ -136,6 +133,7 @@ def test_register_email_invalid_currency_id(
 
 # TODO: обновить ожидаемый статус-код после фиксов
 
+
 @pytest.mark.parametrize(
     "langAlias, description",
     [
@@ -149,11 +147,8 @@ def test_register_email_invalid_currency_id(
     ],
 )
 def test_register_email_invalid_langAlias(
-    auth_client,
-    session_id_email_new,
-    langAlias,
-    description,
-    assert_response):
+    auth_client, session_id_email_new, langAlias, description, assert_response
+):
 
     resp = auth_client.register_email(
         password=TEST_REGISTER_PASSWORD,
@@ -175,6 +170,7 @@ def test_register_email_invalid_langAlias(
 
 # TODO: обновить ожидаемый статус-код после фиксов
 
+
 @pytest.mark.parametrize(
     "sessionId, description",
     [
@@ -190,11 +186,8 @@ def test_register_email_invalid_langAlias(
     ],
 )
 def test_register_email_invalid_sessionId(
-    auth_client,
-    session_id_email_new,
-    sessionId,
-    description,
-    assert_response):
+    auth_client, session_id_email_new, sessionId, description, assert_response
+):
 
     resp = auth_client.register_email(
         password=TEST_REGISTER_PASSWORD,

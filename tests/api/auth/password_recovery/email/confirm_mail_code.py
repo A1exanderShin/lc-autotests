@@ -11,8 +11,7 @@ def test_confirm_mail_code_positive(registered_user_email):
     assert send_resp.code == 200
 
     confirm_resp = guest.confirm_mail_code(
-        mailCode="111111",
-        sessionId=send_resp.sessionId
+        mailCode="111111", sessionId=send_resp.sessionId
     )
 
     assert confirm_resp.code == 200

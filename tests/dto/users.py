@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from src.clients.auth_client import AuthClient
 
 

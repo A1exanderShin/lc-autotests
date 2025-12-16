@@ -4,4 +4,6 @@ def test_login_positive(auth_user_email, assert_response):
 
     resp = auth_user_email.http.get("/user/me")
 
-    assert_response(resp, expected=(200,), msg=f"Ожидали 200, получили {resp.status_code}")
+    assert_response(
+        resp, expected=(200,), msg=f"Ожидали 200, получили {resp.status_code}"
+    )
