@@ -7,6 +7,7 @@ from src.models.auth.email.login_email import LoginEmailResponse
 from src.models.auth.email.register_email import RegisterEmailResponse
 from src.models.auth.fast_reg.confirm import FastRegConfirmResponse
 from src.models.auth.fast_reg.signUp import FastRegSignUpResponse
+from src.models.auth.password_recovery.confirm_mail import ConfirmMailCodeResponse
 from src.models.auth.password_recovery.send_mail import SendMailResponse
 from src.models.auth.phone.check_phone import CheckPhoneResponse
 from src.models.auth.phone.login_phone import LoginPhoneResponse
@@ -176,6 +177,14 @@ class AuthClient:
         }
         response = self.http.post("/auth/password_recovery/send_mail", json=payload)
         return self._parse(response, SendMailResponse)
+
+    def confirm_mail_code(self, mailCode: str, sessionId: str):
+        payload = {
+            "mailCode": mailCode,
+            "sessionId": sessionId
+        }
+        response = self.http.post("/auth/password_recovery/confirm_mail_code", json=payload)
+        return self._parse(response, ConfirmMailCodeResponse)
 
 
 
