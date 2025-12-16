@@ -4,7 +4,9 @@ def test_register_positive(registered_user_email, assert_response):
 
     resp = registered_user_email.http.get("/user/me")
 
-    assert_response(resp, expected=(200,), msg=f"/user/me вернул {resp.status_code}, ожидаем 200")
+    assert_response(
+        resp, expected=(200,), msg=f"/user/me вернул {resp.status_code}, ожидаем 200"
+    )
 
     data = resp.json()
     assert "user" in data, "В ответе отсутствует объект user"

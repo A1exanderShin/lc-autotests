@@ -13,8 +13,7 @@ def assert_response():
         # -----------------------------
         if isinstance(resp, ErrorResponse):
             assert resp.code in expected, (
-                f"{msg} Ожидали {expected}, "
-                f"но получили {resp.code}. Ответ: {resp}"
+                f"{msg} Ожидали {expected}, " f"но получили {resp.code}. Ответ: {resp}"
             )
             return resp
 
@@ -23,8 +22,7 @@ def assert_response():
         # -----------------------------
         if hasattr(resp, "code") and not hasattr(resp, "status_code"):
             assert resp.code in expected, (
-                f"{msg} Ожидали {expected}, "
-                f"но получили {resp.code}. Ответ: {resp}"
+                f"{msg} Ожидали {expected}, " f"но получили {resp.code}. Ответ: {resp}"
             )
             return resp
 
@@ -33,9 +31,9 @@ def assert_response():
         # -----------------------------
         status = resp.status_code
         text = getattr(resp, "text", "")
-        assert status in expected, (
-            f"{msg} Ожидали {expected}, но получили {status}. Ответ: {text}"
-        )
+        assert (
+            status in expected
+        ), f"{msg} Ожидали {expected}, но получили {status}. Ответ: {text}"
 
         return resp
 

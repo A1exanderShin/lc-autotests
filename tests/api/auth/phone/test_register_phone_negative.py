@@ -1,18 +1,18 @@
 import pytest
 
 from tests.fixtures.auth_fixtures import (
-    TEST_REGISTER_PASSWORD,
     TEST_IP,
     TEST_PLATFORM,
+    TEST_REGISTER_PASSWORD,
     TEST_USER_AGENT,
 )
-
 
 # ==========================================================
 # 1. ОТСУТСТВУЮЩИЕ ПОЛЯ (STRUCTURE)
 # ==========================================================
 
 # TODO: обновить ожидаемый статус-код после фиксов
+
 
 @pytest.mark.parametrize(
     "use_password, use_session, description",
@@ -24,11 +24,11 @@ from tests.fixtures.auth_fixtures import (
 )
 def test_register_phone_missing_fields(
     auth_client,
-    session_id_phone_new,       # флоу: check_phone → получить sessionId
+    session_id_phone_new,  # флоу: check_phone → получить sessionId
     use_password,
     use_session,
     description,
-    assert_response
+    assert_response,
 ):
 
     payload = {}
@@ -44,7 +44,7 @@ def test_register_phone_missing_fields(
     assert_response(
         resp,
         expected=(400, 401, 403, 404),
-        msg=f"Отсутствуют обязательные поля: {description}"
+        msg=f"Отсутствуют обязательные поля: {description}",
     )
 
 
@@ -53,6 +53,7 @@ def test_register_phone_missing_fields(
 # ==========================================================
 
 # TODO: обновить ожидаемый статус-код после фиксов
+
 
 @pytest.mark.parametrize(
     "password, description",
@@ -68,17 +69,10 @@ def test_register_phone_missing_fields(
     ],
 )
 def test_register_phone_invalid_password(
-    auth_client,
-    session_id_phone_new,
-    password,
-    description,
-    assert_response
+    auth_client, session_id_phone_new, password, description, assert_response
 ):
 
-    resp = auth_client.register_phone(
-        password=password,
-        sessionId=session_id_phone_new
-    )
+    resp = auth_client.register_phone(password=password, sessionId=session_id_phone_new)
 
     assert_response(
         resp,
@@ -92,6 +86,7 @@ def test_register_phone_invalid_password(
 # ==========================================================
 
 # TODO: обновить ожидаемый статус-код после фиксов
+
 
 @pytest.mark.parametrize(
     "sessionId, description",
@@ -108,11 +103,7 @@ def test_register_phone_invalid_password(
     ],
 )
 def test_register_phone_invalid_sessionId(
-    auth_client,
-    session_id_phone_new,
-    sessionId,
-    description,
-    assert_response
+    auth_client, session_id_phone_new, sessionId, description, assert_response
 ):
 
     resp = auth_client.register_phone(

@@ -1,15 +1,18 @@
 import pytest
 
 from tests.fixtures.auth_fixtures import (
-    TEST_REGISTER_PASSWORD,
     TEST_IP,
     TEST_PLATFORM,
-    TEST_USER_AGENT, random_phone, random_email,
+    TEST_REGISTER_PASSWORD,
+    TEST_USER_AGENT,
+    random_email,
+    random_phone,
 )
 
 # ==========================================================
 # 1. ОТСУТСТВУЮЩИЕ ПОЛЯ (STRUCTURE)
 # ==========================================================
+
 
 @pytest.mark.parametrize(
     "use_email, use_password, use_currency_id, use_langAlias, description",
@@ -29,29 +32,32 @@ def test_signUpEmail_missing_fields(
     use_langAlias,
     description,
     random_email,
-    assert_response
+    assert_response,
 ):
 
     # Собираем payload согласно пересечению параметров
     payload = {}
-    if use_email: payload["email"] = random_email
-    if use_password: payload["password"] = TEST_REGISTER_PASSWORD
-    if use_currency_id: payload["currency_id"] = 4
-    if use_langAlias: payload["langAlias"] = "en"
+    if use_email:
+        payload["email"] = random_email
+    if use_password:
+        payload["password"] = TEST_REGISTER_PASSWORD
+    if use_currency_id:
+        payload["currency_id"] = 4
+    if use_langAlias:
+        payload["langAlias"] = "en"
 
     # Передаём как именованные аргументы — signup_email сам соберёт payload
     resp = auth_client.http.post("/auth/signUpEmail", json=payload)
 
     assert_response(
-        resp,
-        expected=(400, 500),
-        msg=f"Отсутствуют обязательные поля: {description}"
+        resp, expected=(400, 500), msg=f"Отсутствуют обязательные поля: {description}"
     )
 
 
 # ==========================================================
 # 2. НЕВАЛИДНЫЙ password
 # ==========================================================
+
 
 @pytest.mark.parametrize(
     "password, description",
@@ -66,11 +72,7 @@ def test_signUpEmail_missing_fields(
     ],
 )
 def test_signUpEmail_invalid_password(
-    auth_client,
-    random_email,
-    password,
-    description,
-    assert_response
+    auth_client, random_email, password, description, assert_response
 ):
 
     payload = {
@@ -88,9 +90,11 @@ def test_signUpEmail_invalid_password(
         msg=f"Неверное значение password: {description}",
     )
 
+
 # ==========================================================
 # 3. НЕВЕРНЫЕ ТИПЫ email (int, bool, list, dict) → 500
 # ==========================================================
+
 
 @pytest.mark.parametrize(
     "email, description",
@@ -103,10 +107,7 @@ def test_signUpEmail_invalid_password(
     ],
 )
 def test_signUpEmail_invalid_email_type(
-    auth_client,
-    email,
-    description,
-    assert_response
+    auth_client, email, description, assert_response
 ):
 
     payload = {
@@ -123,6 +124,7 @@ def test_signUpEmail_invalid_email_type(
         expected=(400, 500),
         msg=f"Неверный тип email: {description}",
     )
+
 
 # ==========================================================
 # 4. НЕВЕРНЫЕ ФОРМАТЫ email (string, но невалидные) → 400
@@ -145,12 +147,10 @@ INVALID_EMAIL_FORMATS = [
     ("", "пустая строка"),
 ]
 
+
 @pytest.mark.parametrize("email, description", INVALID_EMAIL_FORMATS)
 def test_signUpEmail_invalid_email_format(
-    auth_client,
-    email,
-    description,
-    assert_response
+    auth_client, email, description, assert_response
 ):
 
     payload = {
@@ -168,25 +168,26 @@ def test_signUpEmail_invalid_email_format(
         msg=f"Неверный формат email: {description}",
     )
 
+
 # ==========================================================
 # 5. НЕВАЛИДНЫЕ currency_id
 # ==========================================================
 
+
 @pytest.mark.parametrize(
     "currency_id, description",
     [
-        ("4", "currency_id = string"),     # строка вместо числа
+        ("4", "currency_id = string"),  # строка вместо числа
         (None, "currency_id = null"),
         (True, "currency_id = boolean"),
         (3.14, "currency_id = float"),
         (["4"], "currency_id = список"),
         ({"id": 4}, "currency_id = объект"),
-
         (-1, "currency_id отрицательное"),
         (0, "currency_id = 0"),
         (9999, "currency_id слишком большое"),
         (10**50, "currency_id крайне большое число"),
-    ]
+    ],
 )
 def test_signUpEmail_invalid_currency_id(
     auth_client,
@@ -211,9 +212,11 @@ def test_signUpEmail_invalid_currency_id(
         msg=f"Неверное значение currency_id: {description}",
     )
 
+
 # ==========================================================
 # 6. НЕВАЛИДНЫЙ langAlias
 # ==========================================================
+
 
 @pytest.mark.parametrize(
     "langAlias, description",
@@ -223,7 +226,6 @@ def test_signUpEmail_invalid_currency_id(
         (None, "langAlias = null"),
         (["en"], "langAlias = список"),
         ({"lang": "en"}, "langAlias = объект"),
-
         ("", "langAlias пустой"),
         (" ", "langAlias пробел"),
         ("EN", "верхний регистр"),
@@ -233,7 +235,7 @@ def test_signUpEmail_invalid_currency_id(
         ("😀😀😀", "эмодзи"),
         ("xx", "неизвестная локаль"),
         ("zzz", "невалидная зона локали"),
-    ]
+    ],
 )
 def test_signUpEmail_invalid_langAlias(
     auth_client,
@@ -257,4 +259,3 @@ def test_signUpEmail_invalid_langAlias(
         expected=(400, 500),
         msg=f"Неверное значение langAlias: {description}",
     )
-

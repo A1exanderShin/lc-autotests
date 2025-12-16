@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ConfirmMailCodeResponse(BaseModel):
+class ChangePasswordResponse(BaseModel):
     code: int
     codeText: str
     status: str

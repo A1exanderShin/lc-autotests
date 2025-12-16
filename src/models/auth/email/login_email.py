@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class LoginEmailResponse(BaseModel):
     code: int
     codeText: str
@@ -7,4 +8,3 @@ class LoginEmailResponse(BaseModel):
     token: str
     refreshToken: str
     langAlias: str
-

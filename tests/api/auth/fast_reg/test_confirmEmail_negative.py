@@ -14,8 +14,9 @@ import pytest
         ("😀😀😀", "sessionId = emoji"),
         ("1" * 5000, "слишком длинный sessionId"),
         ("00000000-0000-0000-0000-000000000000", "несуществующий sessionId"),
-        ("not-a-uuid", "не uuid, но строка")
-    ])
+        ("not-a-uuid", "не uuid, но строка"),
+    ],
+)
 def test_confirm_email_negative(auth_client, session_id, description, assert_response):
     resp = auth_client.confirm_email(session_id=session_id)
     assert_response(

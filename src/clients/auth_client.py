@@ -7,6 +7,7 @@ from src.models.auth.email.login_email import LoginEmailResponse
 from src.models.auth.email.register_email import RegisterEmailResponse
 from src.models.auth.fast_reg.confirm import FastRegConfirmResponse
 from src.models.auth.fast_reg.signUp import FastRegSignUpResponse
+from src.models.auth.password_recovery.change_password import ChangePasswordResponse
 from src.models.auth.password_recovery.confirm_mail import ConfirmMailCodeResponse
 from src.models.auth.password_recovery.send_mail import SendMailResponse
 from src.models.auth.phone.check_phone import CheckPhoneResponse
@@ -19,6 +20,10 @@ class AuthClient:
         self.http = HttpBase(base_url)
 
     def _parse(self, response, model_cls):
+        """
+        Parses HTTP response into success or error pydantic models.
+        Returns raw response if parsing fails.
+        """
         if response.status_code == 200:
             try:
                 return model_cls(**response.json())
@@ -43,7 +48,9 @@ class AuthClient:
 
         return parsed
 
-    def register_email(self, password: str, currency_id: int, langAlias: str, sessionId: str):
+    def register_email(
+        self, password: str, currency_id: int, langAlias: str, sessionId: str
+    ):
         payload = {
             "password": password,
             "currency_id": currency_id,
@@ -54,7 +61,6 @@ class AuthClient:
         response = self.http.post("/auth/email_register", json=payload)
         parsed = self._parse(response, RegisterEmailResponse)
 
-        # Если успешный ответ — сохраняем токен
         if isinstance(parsed, RegisterEmailResponse):
             self.http.token = parsed.token
 
@@ -75,15 +81,13 @@ class AuthClient:
 
         return parsed
 
-
-
     # РЕГИСТРАЦИЯ / ВХОД ПО ТЕЛЕФОНУ
     def check_phone(self, phone: str, ip: str, platform: str, user_agent: str):
         payload = {
             "phone": phone,
             "ip": ip,
             "platform": platform,
-            "user_agent": user_agent
+            "user_agent": user_agent,
         }
 
         response = self.http.post("/auth/check_phone", json=payload)
@@ -92,10 +96,7 @@ class AuthClient:
         return parsed
 
     def register_phone(self, password: str, sessionId: str):
-        payload = {
-            "password": password,
-            "sessionId": sessionId
-        }
+        payload = {"password": password, "sessionId": sessionId}
 
         response = self.http.post("/auth/register", json=payload)
         parsed = self._parse(response, RegisterPhoneResponse)
@@ -107,10 +108,7 @@ class AuthClient:
         return parsed
 
     def login_phone(self, password: str, sessionId: str):
-        payload = {
-            "password": password,
-            "sessionId": sessionId
-        }
+        payload = {"password": password, "sessionId": sessionId}
         response = self.http.post("/auth/login", json=payload)
         parsed = self._parse(response, LoginPhoneResponse)
 
@@ -120,14 +118,9 @@ class AuthClient:
 
         return parsed
 
-
-
     # FASTREG
     def signup_phone(self, phone: str, password: str):
-        payload = {
-            "phone": phone,
-            "password": password
-        }
+        payload = {"phone": phone, "password": password}
         response = self.http.post("/auth/signUp", json=payload)
         parsed = self._parse(response, FastRegSignUpResponse)
 
@@ -149,7 +142,7 @@ class AuthClient:
             "email": email,
             "password": password,
             "currency_id": currency_id,
-            "langAlias": langAlias
+            "langAlias": langAlias,
         }
         response = self.http.post("/auth/signUpEmail", json=payload)
         parsed = self._parse(response, FastRegSignUpResponse)
@@ -167,7 +160,6 @@ class AuthClient:
 
         return parsed
 
-
     # PASSWORD RECOVERY
     def send_mail(self, email: str, captcha_key: str = "", captcha: str = ""):
         payload = {
@@ -175,20 +167,27 @@ class AuthClient:
             "captcha_key": captcha_key,
             "captcha": captcha
         }
-        response = self.http.post("/auth/password_recovery/send_mail", json=payload)
+        response = self.http.post(
+            "/auth/password_recovery/send_mail", json=payload
+        )
         return self._parse(response, SendMailResponse)
 
-    def confirm_mail_code(self, mailCode: str, sessionId: str):
+    def confirm_mail_code(self, session_id: str, mail_code: str):
         payload = {
-            "mailCode": mailCode,
-            "sessionId": sessionId
+            "sessionId": session_id,
+            "mailCode": mail_code
         }
-        response = self.http.post("/auth/password_recovery/confirm_mail_code", json=payload)
+        response = self.http.post(
+            "/auth/password_recovery/confirm_mail_code", json=payload
+        )
         return self._parse(response, ConfirmMailCodeResponse)
 
-
-
-
-
-
-
+    def change_password_email(self, session_id: str, password: str):
+        payload = {
+            "sessionId": session_id,
+            "password": password
+        }
+        response = self.http.post(
+            "/auth/password_recovery/email_change_password", json=payload
+        )
+        return self._parse(response, ChangePasswordResponse)
